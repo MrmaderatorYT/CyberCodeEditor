@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Панель з кнопкою відкриття файлу -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="?attr/colorPrimary"
+        android:padding="8dp">
+        <!-- Додайте це до вашого LinearLayout у файлі activity_main.xml -->
+        <ImageButton
+            android:id="@+id/openJarButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_open_jar"
+            android:background="@null"
+            android:padding="8dp" />
+        <ImageButton
+            android:id="@+id/openFileButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_open_file"
+            android:background="@null"
+            android:padding="8dp" />
+
+        <ImageView
+            android:id="@+id/fileIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_file"
+            android:padding="8dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/fileNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:padding="8dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- EditText для редагування коду -->
+    <EditText
+        android:id="@+id/codeEditText"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="top"
+        android:textSize="16sp"
+        android:typeface="monospace"
+        android:inputType="textMultiLine"
+        android:scrollbars="vertical"
+        android:background="@android:color/white" />
+
+</LinearLayout>
