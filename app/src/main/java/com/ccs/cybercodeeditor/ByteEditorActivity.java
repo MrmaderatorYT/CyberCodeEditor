@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
@@ -94,15 +95,66 @@ public class ByteEditorActivity extends AppCompatActivity {
         }
         return sb.toString();
     }
+
     private void saveChanges() {
         String hexString = byteEditText.getText().toString().replaceAll("\\s+", "");
         byte[] newBytes = hexStringToByteArray(hexString);
 
         if (newBytes != null) {
-            // Тут можна реалізувати збереження змінених байтів назад у JAR-файл
-            // Це досить складний процес і потребує обережності
+            new Thread(() -> {
+                try {
+                    // Читаємо оригінальний JAR-файл
+                    InputStream inputStream = getContentResolver().openInputStream(jarUri);
+                    JarInputStream jarInputStream = new JarInputStream(inputStream);
+                    ByteArrayOutputStream tempJarOutputStream = new ByteArrayOutputStream();
+                    java.util.jar.JarOutputStream jarOutputStream = new java.util.jar.JarOutputStream(tempJarOutputStream);
 
-            Toast.makeText(this, "Зміни збережено (імітація)", Toast.LENGTH_SHORT).show();
+                    JarEntry jarEntry;
+
+                    // Проходимо через всі entries і копіюємо їх, замінюючи потрібний клас
+                    while ((jarEntry = jarInputStream.getNextJarEntry()) != null) {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+
+                        while ((bytesRead = jarInputStream.read(buffer)) != -1) {
+                            baos.write(buffer, 0, bytesRead);
+                        }
+
+                        byte[] entryBytes = baos.toByteArray();
+
+                        // Якщо це файл класу, який ми редагували, використовуємо нові байти
+                        if (jarEntry.getName().equals(classFileName)) {
+                            entryBytes = newBytes;
+                        }
+
+                        // Записуємо entry до нового JAR-файлу
+                        JarEntry newEntry = new JarEntry(jarEntry.getName());
+                        jarOutputStream.putNextEntry(newEntry);
+                        jarOutputStream.write(entryBytes);
+                        jarOutputStream.closeEntry();
+                    }
+
+                    jarInputStream.close();
+                    jarOutputStream.close();
+
+                    // Записуємо новий JAR-файл
+                    byte[] newJarBytes = tempJarOutputStream.toByteArray();
+                    OutputStream outputStream = getContentResolver().openOutputStream(jarUri, "w");
+                    outputStream.write(newJarBytes);
+                    outputStream.close();
+
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "Зміни збережено успішно", Toast.LENGTH_SHORT).show();
+                    });
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "Помилка при збереженні змін", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }).start();
         } else {
             Toast.makeText(this, "Помилка при конвертації байтів", Toast.LENGTH_SHORT).show();
         }

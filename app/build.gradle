@@ -37,4 +37,7 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+    // Інші залежності
+    implementation 'org.ow2.asm:asm:9.5'
+
 }
